@@ -1,0 +1,5 @@
+No.	isCorrect	type	RT
+1	R	D	950
+2	M	S	0
+3	R	S	935
+4	R	D	714

@@ -1,0 +1,7 @@
+No.	isCorrect	type	RT
+1	M	LD	0
+2	M	SS	0
+3	M	LN	0
+4	M	SN	0
+5	M	LS	0
+6	M	SD	0
