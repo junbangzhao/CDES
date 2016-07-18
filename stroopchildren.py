@@ -50,9 +50,10 @@ class StroopChildren(QtWidgets.QWidget):
         self.labelFix.move((self.width()-self.labelFix.width())/2,(self.height() -self.labelFix.height())/2)
 
         
-        #self.setCursor(Qt.Qt.BlankCursor)
+        self.setCursor(Qt.Qt.BlankCursor)
         self.bResponse = False
         self.RT = QtCore.QElapsedTimer()
+        self.ResponseType = ""
 
     def setRound(self,Round):
         self.Round = Round
@@ -65,7 +66,7 @@ class StroopChildren(QtWidgets.QWidget):
             try:
                 self.Round = int(text)
                 
-                if self.Round % 6 == 0:
+                if (self.Round % 6 == 0) and (self.Round > 0):
                     print ("right")
                     break
             except:        
@@ -74,27 +75,34 @@ class StroopChildren(QtWidgets.QWidget):
         
         self.iRound = 0
         self.bStart = False
-        self.listRound = ['LS','LD','LN','SS','SD','SN']*int(self.Round/4)
+        self.listRound = ['LS','LD','LN','SS','SD','SN']*int(self.Round/6)
         random.shuffle(self.listRound)
         self.ResponseData = []
         self.rData = {}
-        
-        '''
-        self.labelLeft.setText("Stroop效应\n\n 如果左边的数字大用左手食指按F键，\n右边的数字大用右手食指按J键")
-        self.labelLeft.setFont(QtGui.QFont("宋体",40))
-        self.labelLeft.show()
+        self.labelLeft.hide()
+        self.labelRight.hide()
+        self.labelFix.hide()
+        self.labelGuide = QtWidgets.QLabel(self)
+
+        self.labelGuide.setText("数字Stroop效应\n\n 如果左边的数字大用左手食指按F键，\n右边的数字大用右手食指按J键，\n按Enter键开始")
+        self.labelGuide.setFont(QtGui.QFont("宋体",20))
+        self.labelGuide.setGeometry(0,0,500,200)
+        self.labelGuide.move((self.width() - self.labelGuide.width())/2,(self.height() - self.labelGuide.height())/2)
+        self.labelGuide.setAlignment(Qt.Qt.AlignCenter)
+        self.labelGuide.show()
         #print("Show")
         #print(self.bStart)
-        print(self.listRound)
-        '''
+
         
         
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             print(self.ResponseData)
+            self.bStart = False
             self.close()
-        if event.key() == QtCore.Qt.Key_Return:
+        if (event.key() == QtCore.Qt.Key_Return) or (event.key() == QtCore.Qt.Key_Enter):
             if not self.bStart :
+                self.labelGuide.hide()
                 self.labelLeft.hide()
                 self.labelRight.hide()
                 self.labelFix.hide()
@@ -106,8 +114,9 @@ class StroopChildren(QtWidgets.QWidget):
         if event.key() == QtCore.Qt.Key_F:
             if(self.bResponse):
                 self.labelLeft.hide()
+                self.labelRight.hide()
                 self.rData['RT'] = self.RT.elapsed()
-                if(self.listRound[self.iRound] == 'RR' or 'GR'):
+                if self.ResponseType == 'F':
                     self.rData['isCorrect'] = 'R'
                 else:
                     self.rData['isCorrect'] = 'W'
@@ -122,7 +131,7 @@ class StroopChildren(QtWidgets.QWidget):
             if (self.bResponse):
                 self.labelLeft.hide()
                 self.rData['RT'] = self.RT.elapsed()
-                if(self.listRound[self.iRound] == 'RG' or 'GG'):
+                if self.ResponseType == 'J':
                     self.rData['isCorrect'] = 'R'
                 else:
                     self.rData['isCorrect'] = 'W'
@@ -144,47 +153,165 @@ class StroopChildren(QtWidgets.QWidget):
         self.labelFix.hide()
         self.rData['No.'] = self.iRound + 1
         if self.listRound[self.iRound] == 'LS':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",40))
-            self.labelRight.setText("9")
-            self.labelRight.setFont(QtGui.QFont("Times",80))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("9")
+            elif num == 2:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("8")
+            elif num == 3:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("2")
+            
+            if int(self.labelLeft.text()) > int(self.labelRight.text()):
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+                self.ResponseType = 'F'
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
+                self.ResponseType = 'J'
             self.rData['type'] = 'LS'
             print('LS')
         elif self.listRound[self.iRound] == 'LD':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",80))
-            self.labelRight.setText("9")
-            self.labelRight.setFont(QtGui.QFont("Times",40))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("9")
+            elif num == 2:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("8")
+            elif num == 3:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("2")
+            
+            if int(self.labelLeft.text()) < int(self.labelRight.text()):
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+                self.ResponseType = 'J'
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
+                self.ResponseType = 'F'
             self.rData['type'] = 'LD'
             print('LD')
         elif self.listRound[self.iRound] == 'LN':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",40))
-            self.labelRight.setText("9")
-            self.labelRight.setFont(QtGui.QFont("Times",40))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("9")
+            elif num == 2:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("8")
+            elif num == 3:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("2")
+            size = random.randint(1,2)
+            
+            if int(self.labelLeft.text()) < int(self.labelRight.text()):
+                self.ResponseType = 'J'
+            else:
+                self.ResponseType = 'F'
+            if size == 1:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
             self.rData['type'] = 'LN'
-            print('GR')
+            print('LN')
+            
         elif self.listRound[self.iRound] == 'SS':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",40))
-            self.labelRight.setText("2")
-            self.labelRight.setFont(QtGui.QFont("Times",80))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("2")
+            elif num == 2:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("9")
+            elif num == 3:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("8")
+            
+            if int(self.labelLeft.text()) > int(self.labelRight.text()):
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+                self.ResponseType = 'F'
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
+                self.ResponseType = 'J'
             self.rData['type'] = 'SS'
             print('SS')
         elif self.listRound[self.iRound] == 'SD':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",80))
-            self.labelRight.setText("2")
-            self.labelRight.setFont(QtGui.QFont("Times",40))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("2")
+            elif num == 2:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("9")
+            elif num == 3:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("8")
+            
+            if int(self.labelLeft.text()) < int(self.labelRight.text()):
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+                self.ResponseType = 'J'
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
+                self.ResponseType = 'F'
             self.rData['type'] = 'SD'
             print('SD')
         elif self.listRound[self.iRound] == 'SN':
-            self.labelLeft.setText("1")
-            self.labelLeft.setFont(QtGui.QFont("Times",40))
-            self.labelRight.setText("2")
-            self.labelRight.setFont(QtGui.QFont("Times",40))
+            num = random.randint(1,4)
+            if num == 1:
+                self.labelLeft.setText("1")
+                self.labelRight.setText("2")
+            elif num == 2:
+                self.labelLeft.setText("8")
+                self.labelRight.setText("9")
+            elif num == 3:
+                self.labelLeft.setText("2")
+                self.labelRight.setText("1")
+            elif num == 4:
+                self.labelLeft.setText("9")
+                self.labelRight.setText("8")
+            
+            if int(self.labelLeft.text()) < int(self.labelRight.text()):
+                self.ResponseType = 'J'
+            else:
+                self.ResponseType = 'F'
+                
+            size = random.randint(1,2)
+            if size == 1:
+                self.labelLeft.setFont(QtGui.QFont("Times",40))
+                self.labelRight.setFont(QtGui.QFont("Times",40))
+            else:
+                self.labelLeft.setFont(QtGui.QFont("Times",80))
+                self.labelRight.setFont(QtGui.QFont("Times",80))
             self.rData['type'] = 'SN'
             print('SN')
+            
+            
         self.labelLeft.show()
         self.labelRight.show()
         
@@ -221,10 +348,12 @@ class StroopChildren(QtWidgets.QWidget):
             out << "No." << "\t" << "isCorrect" << "\t" << "type" << "\t" << "RT" << "\r\n"
             for RT in self.ResponseData:
                 out << RT['No.'] << "\t" << RT["isCorrect"]<< "\t" << RT["type"] << "\t" << RT["RT"] << "\r\n"
-            self.labelLeft.setText("结束实验，谢谢参与，请按ESC键退出")
-            self.labelLeft.setFont(QtGui.QFont("宋体",20))
-            self.labelLeft.setStyleSheet("color:black")
-            self.labelLeft.show()
+            self.labelFix.setText("结束实验，谢谢参与，\n请按ESC键退出")
+            self.labelFix.setFont(QtGui.QFont("宋体",20))
+            self.labelFix.adjustSize()
+            
+            self.labelFix.setStyleSheet("color:black")
+            self.labelFix.show()
         #print("blank")
         
         
