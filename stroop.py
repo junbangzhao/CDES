@@ -53,7 +53,7 @@ class Stroop(QtWidgets.QWidget):
             try:
                 self.Round = int(text)
                 
-                if self.Round % 4 == 0:
+                if self.Round % 4 == 0 and self.Round > 0:
                     print ("right")
                     break
             except:        
